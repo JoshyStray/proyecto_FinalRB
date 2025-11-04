@@ -1,24 +1,23 @@
 # ========================================
 # SISTEMA DE GESTIÓN DE ALUMNOS
 # Proyecto Final – Programación I
-# Semana 10: Registro de notas en memoria
+# Semana 11: Integración parcial y pruebas en memoria
 # ========================================
 
-# Estructura de datos global
+# Estructura global
 $estudiantes = []
 
 # ----------------------------------------
 # MÉTODOS DEL SISTEMA
 # ----------------------------------------
 
-# 1. Registrar estudiante
+# Registrar estudiante
 def registrar_estudiante
   puts "\n[Registrar Estudiante]"
 
   print "Ingrese el ID del estudiante (número entero): "
   id = gets.chomp.to_i
 
-  # Validar ID único
   if $estudiantes.any? { |e| e[:id] == id }
     puts "❌ Error: Ya existe un estudiante con ese ID.\n\n"
     return
@@ -27,23 +26,19 @@ def registrar_estudiante
   print "Ingrese el nombre completo del estudiante: "
   nombre = gets.chomp.strip
 
-  # Validar nombre no vacío
   if nombre.empty?
     puts "❌ Error: El nombre no puede estar vacío.\n\n"
     return
   end
 
-  # Crear registro
   estudiante = { id: id, nombre: nombre, notas: [] }
   $estudiantes << estudiante
-
   puts "✅ Estudiante registrado con éxito.\n\n"
 end
 
-# 2. Ingresar notas
+# Ingresar notas
 def ingresar_notas
   puts "\n[Ingresar Notas]"
-
   print "Ingrese el ID del estudiante: "
   id = gets.chomp.to_i
 
@@ -60,7 +55,6 @@ def ingresar_notas
     print "Ingrese la nota ##{i + 1} (0.00 - 100.00): "
     nota = gets.chomp
 
-    # Validar que sea numérica
     if nota !~ /^\d+(\.\d+)?$/
       puts "❌ Error: Debe ingresar un número válido."
       redo
@@ -68,7 +62,6 @@ def ingresar_notas
 
     nota = nota.to_f
 
-    # Validar rango
     if nota < 0 || nota > 100
       puts "❌ Error: La nota debe estar entre 0 y 100."
       redo
@@ -81,13 +74,13 @@ def ingresar_notas
   puts "✅ Notas registradas correctamente para #{estudiante[:nombre]}.\n\n"
 end
 
-# 3. Consultar promedio (placeholder)
+# Consultar promedio (a implementar en semana 13)
 def consultar_promedio
   puts "\n[Consultar Promedio]"
   puts "Funcionalidad aún no implementada.\n\n"
 end
 
-# 4. Listar estudiantes
+# Listar estudiantes
 def listar_estudiantes
   puts "\n[Listar Estudiantes]"
   if $estudiantes.empty?
@@ -104,6 +97,19 @@ def listar_estudiantes
 end
 
 # ----------------------------------------
+# SIMULACIÓN DE PRUEBAS (opcional)
+# ----------------------------------------
+
+def simulacion_pruebas
+  puts "\n[Simulación de pruebas con datos de ejemplo]"
+  $estudiantes.clear
+  $estudiantes << { id: 1, nombre: "Ana Torres", notas: [90, 85, 88] }
+  $estudiantes << { id: 2, nombre: "Luis Ramírez", notas: [70, 80, 75] }
+  $estudiantes << { id: 3, nombre: "María Gómez", notas: [95, 98, 100] }
+  puts "✅ Se han cargado 3 estudiantes de prueba.\n\n"
+end
+
+# ----------------------------------------
 # Menú principal
 # ----------------------------------------
 
@@ -114,9 +120,10 @@ def mostrar_menu
     puts "2. Ingresar notas"
     puts "3. Consultar promedio por estudiante"
     puts "4. Listar todos los estudiantes"
-    puts "5. Salir"
+    puts "5. Cargar datos de prueba"
+    puts "6. Salir"
     print "Seleccione una opción: "
-    
+
     opcion = gets.chomp
 
     case opcion
@@ -129,6 +136,8 @@ def mostrar_menu
     when "4"
       listar_estudiantes
     when "5"
+      simulacion_pruebas
+    when "6"
       puts "\nSaliendo del sistema... ¡Hasta luego!"
       break
     else
@@ -138,6 +147,6 @@ def mostrar_menu
 end
 
 # ----------------------------------------
-# Ejecución del programa
+# EJECUCIÓN
 # ----------------------------------------
 mostrar_menu
