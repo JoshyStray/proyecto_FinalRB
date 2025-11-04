@@ -1,20 +1,53 @@
 # ========================================
 # SISTEMA DE GESTIÓN DE ALUMNOS
 # Proyecto Final – Programación I
-# Semana 11: Integración parcial y pruebas en memoria
+# Semana 12: Manejo de archivos CSV (guardar y cargar)
 # ========================================
+
+require 'csv'
+
+# Archivo donde se guardarán los datos
+ARCHIVO_DATOS = "estudiantes.csv"
 
 # Estructura global
 $estudiantes = []
 
 # ----------------------------------------
-# MÉTODOS DEL SISTEMA
+# FUNCIONES DE ARCHIVOS
 # ----------------------------------------
 
-# Registrar estudiante
+def cargar_datos
+  if File.exist?(ARCHIVO_DATOS)
+    $estudiantes.clear
+    CSV.foreach(ARCHIVO_DATOS, headers: true) do |fila|
+      notas = fila["notas"].split(";").map(&:to_f)
+      $estudiantes << {
+        id: fila["id"].to_i,
+        nombre: fila["nombre"],
+        notas: notas
+      }
+    end
+    puts "📂 Datos cargados correctamente desde #{ARCHIVO_DATOS}.\n\n"
+  else
+    puts "⚠️ No se encontró archivo de datos, iniciando base vacía.\n\n"
+  end
+end
+
+def guardar_datos
+  CSV.open(ARCHIVO_DATOS, "w", write_headers: true, headers: ["id", "nombre", "notas"]) do |csv|
+    $estudiantes.each do |e|
+      csv << [e[:id], e[:nombre], e[:notas].join(";")]
+    end
+  end
+  puts "💾 Datos guardados correctamente en #{ARCHIVO_DATOS}."
+end
+
+# ----------------------------------------
+# FUNCIONALIDADES DEL SISTEMA
+# ----------------------------------------
+
 def registrar_estudiante
   puts "\n[Registrar Estudiante]"
-
   print "Ingrese el ID del estudiante (número entero): "
   id = gets.chomp.to_i
 
@@ -36,7 +69,6 @@ def registrar_estudiante
   puts "✅ Estudiante registrado con éxito.\n\n"
 end
 
-# Ingresar notas
 def ingresar_notas
   puts "\n[Ingresar Notas]"
   print "Ingrese el ID del estudiante: "
@@ -61,7 +93,6 @@ def ingresar_notas
     end
 
     nota = nota.to_f
-
     if nota < 0 || nota > 100
       puts "❌ Error: La nota debe estar entre 0 y 100."
       redo
@@ -74,13 +105,6 @@ def ingresar_notas
   puts "✅ Notas registradas correctamente para #{estudiante[:nombre]}.\n\n"
 end
 
-# Consultar promedio (a implementar en semana 13)
-def consultar_promedio
-  puts "\n[Consultar Promedio]"
-  puts "Funcionalidad aún no implementada.\n\n"
-end
-
-# Listar estudiantes
 def listar_estudiantes
   puts "\n[Listar Estudiantes]"
   if $estudiantes.empty?
@@ -96,21 +120,13 @@ def listar_estudiantes
   end
 end
 
-# ----------------------------------------
-# SIMULACIÓN DE PRUEBAS (opcional)
-# ----------------------------------------
-
-def simulacion_pruebas
-  puts "\n[Simulación de pruebas con datos de ejemplo]"
-  $estudiantes.clear
-  $estudiantes << { id: 1, nombre: "Ana Torres", notas: [90, 85, 88] }
-  $estudiantes << { id: 2, nombre: "Luis Ramírez", notas: [70, 80, 75] }
-  $estudiantes << { id: 3, nombre: "María Gómez", notas: [95, 98, 100] }
-  puts "✅ Se han cargado 3 estudiantes de prueba.\n\n"
+def consultar_promedio
+  puts "\n[Consultar Promedio]"
+  puts "Funcionalidad aún no implementada.\n\n"
 end
 
 # ----------------------------------------
-# Menú principal
+# MENÚ PRINCIPAL
 # ----------------------------------------
 
 def mostrar_menu
@@ -120,8 +136,7 @@ def mostrar_menu
     puts "2. Ingresar notas"
     puts "3. Consultar promedio por estudiante"
     puts "4. Listar todos los estudiantes"
-    puts "5. Cargar datos de prueba"
-    puts "6. Salir"
+    puts "5. Salir"
     print "Seleccione una opción: "
 
     opcion = gets.chomp
@@ -136,8 +151,7 @@ def mostrar_menu
     when "4"
       listar_estudiantes
     when "5"
-      simulacion_pruebas
-    when "6"
+      guardar_datos
       puts "\nSaliendo del sistema... ¡Hasta luego!"
       break
     else
@@ -149,4 +163,6 @@ end
 # ----------------------------------------
 # EJECUCIÓN
 # ----------------------------------------
+
+cargar_datos
 mostrar_menu
