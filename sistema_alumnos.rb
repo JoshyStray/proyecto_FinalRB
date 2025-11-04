@@ -1,78 +1,7 @@
 # ========================================
 # SISTEMA DE GESTIÓN DE ALUMNOS
 # Proyecto Final – Programación I
-# Semana 8: Menú inicial y métodos base
-# ========================================
-
-# Estructura de datos inicial
-$estudiantes = []
-
-# ----------------------------------------
-# Métodos vacíos (se implementarán luego)
-# ----------------------------------------
-
-def registrar_estudiante
-  puts "\n[Registrar Estudiante]"
-  puts "Funcionalidad aún no implementada.\n\n"
-end
-
-def ingresar_notas
-  puts "\n[Ingresar Notas]"
-  puts "Funcionalidad aún no implementada.\n\n"
-end
-
-def consultar_promedio
-  puts "\n[Consultar Promedio]"
-  puts "Funcionalidad aún no implementada.\n\n"
-end
-
-def listar_estudiantes
-  puts "\n[Listar Estudiantes]"
-  puts "Funcionalidad aún no implementada.\n\n"
-end
-
-# ----------------------------------------
-# Menú principal
-# ----------------------------------------
-
-def mostrar_menu
-  loop do
-    puts "===== SISTEMA DE GESTIÓN DE ALUMNOS ====="
-    puts "1. Registrar estudiante"
-    puts "2. Ingresar notas"
-    puts "3. Consultar promedio por estudiante"
-    puts "4. Listar todos los estudiantes"
-    puts "5. Salir"
-    print "Seleccione una opción: "
-    
-    opcion = gets.chomp
-
-    case opcion
-    when "1"
-      registrar_estudiante
-    when "2"
-      ingresar_notas
-    when "3"
-      consultar_promedio
-    when "4"
-      listar_estudiantes
-    when "5"
-      puts "\nSaliendo del sistema... ¡Hasta luego!"
-      break
-    else
-      puts "\nOpción inválida. Intente de nuevo.\n\n"
-    end
-  end
-end
-
-# ----------------------------------------
-# Ejecución del programa
-# ----------------------------------------
-mostrar_menu
-# ========================================
-# SISTEMA DE GESTIÓN DE ALUMNOS
-# Proyecto Final – Programación I
-# Semana 9: Registro de estudiantes
+# Semana 10: Registro de notas en memoria
 # ========================================
 
 # Estructura de datos global
@@ -111,10 +40,45 @@ def registrar_estudiante
   puts "✅ Estudiante registrado con éxito.\n\n"
 end
 
-# 2. Ingresar notas (placeholder)
+# 2. Ingresar notas
 def ingresar_notas
   puts "\n[Ingresar Notas]"
-  puts "Funcionalidad aún no implementada.\n\n"
+
+  print "Ingrese el ID del estudiante: "
+  id = gets.chomp.to_i
+
+  estudiante = $estudiantes.find { |e| e[:id] == id }
+
+  if estudiante.nil?
+    puts "❌ Error: No existe un estudiante con ese ID.\n\n"
+    return
+  end
+
+  notas = []
+
+  3.times do |i|
+    print "Ingrese la nota ##{i + 1} (0.00 - 100.00): "
+    nota = gets.chomp
+
+    # Validar que sea numérica
+    if nota !~ /^\d+(\.\d+)?$/
+      puts "❌ Error: Debe ingresar un número válido."
+      redo
+    end
+
+    nota = nota.to_f
+
+    # Validar rango
+    if nota < 0 || nota > 100
+      puts "❌ Error: La nota debe estar entre 0 y 100."
+      redo
+    end
+
+    notas << nota
+  end
+
+  estudiante[:notas] = notas
+  puts "✅ Notas registradas correctamente para #{estudiante[:nombre]}.\n\n"
 end
 
 # 3. Consultar promedio (placeholder)
@@ -123,16 +87,17 @@ def consultar_promedio
   puts "Funcionalidad aún no implementada.\n\n"
 end
 
-# 4. Listar estudiantes (placeholder)
+# 4. Listar estudiantes
 def listar_estudiantes
   puts "\n[Listar Estudiantes]"
   if $estudiantes.empty?
     puts "No hay estudiantes registrados.\n\n"
   else
-    puts "ID\tNombre"
-    puts "-" * 30
+    puts "ID\tNombre\t\tNotas"
+    puts "-" * 40
     $estudiantes.each do |e|
-      puts "#{e[:id]}\t#{e[:nombre]}"
+      notas_str = e[:notas].empty? ? "Sin notas" : e[:notas].join(", ")
+      puts "#{e[:id]}\t#{e[:nombre]}\t#{notas_str}"
     end
     puts "\n"
   end
