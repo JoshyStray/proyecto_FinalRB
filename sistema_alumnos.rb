@@ -1,26 +1,28 @@
 # ========================================
 # SISTEMA DE GESTIÓN DE ALUMNOS
 # Proyecto Final – Programación I
-# Semana 12: Manejo de archivos CSV (guardar y cargar)
+# Semana 14: Listar estudiantes con promedio
 # ========================================
 
 require 'csv'
 
-# Archivo donde se guardarán los datos
 ARCHIVO_DATOS = "estudiantes.csv"
-
-# Estructura global
 $estudiantes = []
 
 # ----------------------------------------
-# FUNCIONES DE ARCHIVOS
+# FUNCIONES DE ARCHIVO
 # ----------------------------------------
 
 def cargar_datos
   if File.exist?(ARCHIVO_DATOS)
     $estudiantes.clear
     CSV.foreach(ARCHIVO_DATOS, headers: true) do |fila|
-      notas = fila["notas"].split(";").map(&:to_f)
+      next if fila.nil? || fila["id"].nil?
+
+      notas_str = fila["notas"] || ""
+      separador = notas_str.include?(";") ? ";" : ","
+      notas = notas_str.split(separador).map(&:to_f).reject(&:zero?) rescue []
+
       $estudiantes << {
         id: fila["id"].to_i,
         nombre: fila["nombre"],
@@ -43,7 +45,7 @@ def guardar_datos
 end
 
 # ----------------------------------------
-# FUNCIONALIDADES DEL SISTEMA
+# FUNCIONES DEL SISTEMA
 # ----------------------------------------
 
 def registrar_estudiante
@@ -64,8 +66,7 @@ def registrar_estudiante
     return
   end
 
-  estudiante = { id: id, nombre: nombre, notas: [] }
-  $estudiantes << estudiante
+  $estudiantes << { id: id, nombre: nombre, notas: [] }
   puts "✅ Estudiante registrado con éxito.\n\n"
 end
 
@@ -81,48 +82,61 @@ def ingresar_notas
     return
   end
 
-  notas = []
+  puts "Actualmente tiene las notas: #{estudiante[:notas].join(', ')}"
+  print "¿Cuántas notas nuevas desea ingresar? "
+  cantidad = gets.chomp.to_i
 
-  3.times do |i|
+  cantidad.times do |i|
     print "Ingrese la nota ##{i + 1} (0.00 - 100.00): "
-    nota = gets.chomp
-
-    if nota !~ /^\d+(\.\d+)?$/
-      puts "❌ Error: Debe ingresar un número válido."
-      redo
-    end
-
-    nota = nota.to_f
+    nota = gets.chomp.to_f
     if nota < 0 || nota > 100
       puts "❌ Error: La nota debe estar entre 0 y 100."
       redo
     end
-
-    notas << nota
+    estudiante[:notas] << nota
   end
 
-  estudiante[:notas] = notas
-  puts "✅ Notas registradas correctamente para #{estudiante[:nombre]}.\n\n"
-end
-
-def listar_estudiantes
-  puts "\n[Listar Estudiantes]"
-  if $estudiantes.empty?
-    puts "No hay estudiantes registrados.\n\n"
-  else
-    puts "ID\tNombre\t\tNotas"
-    puts "-" * 40
-    $estudiantes.each do |e|
-      notas_str = e[:notas].empty? ? "Sin notas" : e[:notas].join(", ")
-      puts "#{e[:id]}\t#{e[:nombre]}\t#{notas_str}"
-    end
-    puts "\n"
-  end
+  puts "✅ Notas actualizadas correctamente para #{estudiante[:nombre]}.\n\n"
 end
 
 def consultar_promedio
   puts "\n[Consultar Promedio]"
-  puts "Funcionalidad aún no implementada.\n\n"
+  print "Ingrese el ID del estudiante: "
+  id = gets.chomp.to_i
+
+  estudiante = $estudiantes.find { |e| e[:id] == id }
+
+  if estudiante.nil?
+    puts "❌ Error: No se encontró un estudiante con ese ID.\n\n"
+    return
+  end
+
+  if estudiante[:notas].empty?
+    puts "⚠️ El estudiante #{estudiante[:nombre]} no tiene notas registradas.\n\n"
+    return
+  end
+
+  promedio = (estudiante[:notas].sum / estudiante[:notas].size).round(2)
+  puts "📘 Estudiante: #{estudiante[:nombre]}"
+  puts "Notas: #{estudiante[:notas].join(', ')}"
+  puts "Promedio: #{promedio}\n\n"
+end
+
+# 🆕 Semana 14: Listar con promedio
+def listar_estudiantes
+  puts "\n[Listar Estudiantes con Promedio]"
+  if $estudiantes.empty?
+    puts "No hay estudiantes registrados.\n\n"
+  else
+    puts "ID\tNombre\t\tNotas\t\tPromedio"
+    puts "-" * 60
+    $estudiantes.each do |e|
+      notas_str = e[:notas].empty? ? "Sin notas" : e[:notas].join(", ")
+      promedio = e[:notas].empty? ? "N/A" : (e[:notas].sum / e[:notas].size).round(2)
+      puts "#{e[:id]}\t#{e[:nombre].ljust(16)}\t#{notas_str.ljust(15)}\t#{promedio}"
+    end
+    puts "\n"
+  end
 end
 
 # ----------------------------------------
@@ -135,21 +149,17 @@ def mostrar_menu
     puts "1. Registrar estudiante"
     puts "2. Ingresar notas"
     puts "3. Consultar promedio por estudiante"
-    puts "4. Listar todos los estudiantes"
+    puts "4. Listar todos los estudiantes con promedio"
     puts "5. Salir"
     print "Seleccione una opción: "
 
     opcion = gets.chomp
 
     case opcion
-    when "1"
-      registrar_estudiante
-    when "2"
-      ingresar_notas
-    when "3"
-      consultar_promedio
-    when "4"
-      listar_estudiantes
+    when "1" then registrar_estudiante
+    when "2" then ingresar_notas
+    when "3" then consultar_promedio
+    when "4" then listar_estudiantes
     when "5"
       guardar_datos
       puts "\nSaliendo del sistema... ¡Hasta luego!"
