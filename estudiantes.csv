@@ -1,11 +1,11 @@
 id,nombre,notas
-101,Ana Pérez,85.0
-102,Luis Gómez,70.0
-103,Carlos Hernández,95.0
-104,Julio Verne,69.0
-105,Dionisio Azulon,85.0
-106,Valentin Elizalde,99.0
+101,Ana Pérez,85.0;98.0;62.0
+102,Luis Gómez,70.0;78.0;87.0
+103,Carlos Hernández,95.0;95.0;68.0
+104,Julio Verne,69.0;85.0;69.0
+105,Dionisio Azulon,85.0;75.0;98.0
+106,Valentin Elizalde,99.0;75.0;83.0
 107,Nick Cage,95.0;78.0;85.0
-108,Darius black,90.0
-109,kirck Hammet,91.0
-110,Mary Mansom,97.0
+108,Darius black,90.0;98.0;63.0
+109,kirck Hammet,91.0;82.0;76.0
+110,Mary Mansom,97.0;75.0;94.0

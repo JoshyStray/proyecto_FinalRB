@@ -1,7 +1,9 @@
 # ========================================
-# SISTEMA DE GESTIÓN DE ALUMNOS
+# UNIVERSIDAD REGIONAL
 # Proyecto Final – Programación I
-# Semana 15: Versión candidata final
+# Sistema de Gestión de Alumnos
+# Semana 16: Versión final revisada
+# Autor: Joshua Icaj
 # ========================================
 
 require 'csv'
@@ -13,7 +15,7 @@ $estudiantes = []
 # FUNCIONES DE ARCHIVO
 # ----------------------------------------
 
-# Cargar los datos desde el archivo CSV si existe
+# Cargar datos desde el archivo CSV
 def cargar_datos
   if File.exist?(ARCHIVO_DATOS)
     $estudiantes.clear
@@ -30,27 +32,26 @@ def cargar_datos
         notas: notas
       }
     end
-    puts "📂 Datos cargados correctamente desde #{ARCHIVO_DATOS}.\n\n"
+    puts "📂 Datos cargados correctamente desde '#{ARCHIVO_DATOS}'.\n\n"
   else
-    puts "⚠️ No se encontró archivo de datos, iniciando base vacía.\n\n"
+    puts "⚠️ No se encontró el archivo '#{ARCHIVO_DATOS}', iniciando una base vacía.\n\n"
   end
 end
 
-# Guardar los datos actuales en el archivo CSV
+# Guardar datos actuales en el CSV
 def guardar_datos
   CSV.open(ARCHIVO_DATOS, "w", write_headers: true, headers: ["id", "nombre", "notas"]) do |csv|
     $estudiantes.each do |e|
       csv << [e[:id], e[:nombre], e[:notas].join(";")]
     end
   end
-  puts "💾 Datos guardados correctamente en #{ARCHIVO_DATOS}."
+  puts "💾 Datos guardados correctamente en '#{ARCHIVO_DATOS}'."
 end
 
 # ----------------------------------------
 # FUNCIONALIDADES PRINCIPALES
 # ----------------------------------------
 
-# Registrar estudiante
 def registrar_estudiante
   puts "\n[Registrar Estudiante]"
   print "Ingrese el ID del estudiante (número entero): "
@@ -73,7 +74,6 @@ def registrar_estudiante
   puts "✅ Estudiante registrado con éxito.\n\n"
 end
 
-# Ingresar notas a un estudiante
 def ingresar_notas
   puts "\n[Ingresar Notas]"
   print "Ingrese el ID del estudiante: "
@@ -86,26 +86,26 @@ def ingresar_notas
     return
   end
 
-  puts "Actualmente tiene las notas: #{estudiante[:notas].join(', ')}"
+  puts "Notas actuales: #{estudiante[:notas].empty? ? 'Ninguna' : estudiante[:notas].join(', ')}"
   print "¿Cuántas notas nuevas desea ingresar? "
   cantidad = gets.chomp.to_i
 
   cantidad.times do |i|
     print "Ingrese la nota ##{i + 1} (0.00 - 100.00): "
-    nota = gets.chomp.to_f
+    nota = gets.chomp
 
-    if nota < 0 || nota > 100
-      puts "❌ Error: La nota debe estar entre 0 y 100."
+    # Validación más segura
+    if nota !~ /^\d+(\.\d+)?$/ || nota.to_f < 0 || nota.to_f > 100
+      puts "❌ Error: Debe ingresar una nota válida entre 0 y 100."
       redo
     end
 
-    estudiante[:notas] << nota
+    estudiante[:notas] << nota.to_f
   end
 
   puts "✅ Notas actualizadas correctamente para #{estudiante[:nombre]}.\n\n"
 end
 
-# Consultar promedio de un estudiante
 def consultar_promedio
   puts "\n[Consultar Promedio]"
   print "Ingrese el ID del estudiante: "
@@ -129,14 +129,13 @@ def consultar_promedio
   puts "Promedio: #{promedio}\n\n"
 end
 
-# Listar todos los estudiantes con promedio
 def listar_estudiantes
   puts "\n[Listar Estudiantes con Promedio]"
   if $estudiantes.empty?
     puts "No hay estudiantes registrados.\n\n"
   else
     puts "ID\tNombre\t\t\tNotas\t\t\tPromedio"
-    puts "-" * 75
+    puts "-" * 80
     $estudiantes.each do |e|
       notas_str = e[:notas].empty? ? "Sin notas" : e[:notas].join(", ")
       promedio = e[:notas].empty? ? "N/A" : (e[:notas].sum / e[:notas].size).round(2)
@@ -157,7 +156,7 @@ def mostrar_menu
     puts "2. Ingresar notas"
     puts "3. Consultar promedio por estudiante"
     puts "4. Listar todos los estudiantes con promedio"
-    puts "5. Salir"
+    puts "5. Salir y guardar"
     print "Seleccione una opción: "
 
     opcion = gets.chomp
@@ -169,10 +168,10 @@ def mostrar_menu
     when "4" then listar_estudiantes
     when "5"
       guardar_datos
-      puts "\nSaliendo del sistema... ¡Hasta luego!"
+      puts "\nGracias por usar el Sistema de Gestión de Alumnos. ¡Hasta luego!"
       break
     else
-      puts "\nOpción inválida. Intente de nuevo.\n\n"
+      puts "\nOpción inválida. Intente nuevamente.\n\n"
     end
   end
 end
