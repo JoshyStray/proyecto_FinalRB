@@ -1,7 +1,7 @@
 # ========================================
 # SISTEMA DE GESTIÓN DE ALUMNOS
 # Proyecto Final – Programación I
-# Semana 14: Listar estudiantes con promedio
+# Semana 15: Versión candidata final
 # ========================================
 
 require 'csv'
@@ -13,6 +13,7 @@ $estudiantes = []
 # FUNCIONES DE ARCHIVO
 # ----------------------------------------
 
+# Cargar los datos desde el archivo CSV si existe
 def cargar_datos
   if File.exist?(ARCHIVO_DATOS)
     $estudiantes.clear
@@ -35,6 +36,7 @@ def cargar_datos
   end
 end
 
+# Guardar los datos actuales en el archivo CSV
 def guardar_datos
   CSV.open(ARCHIVO_DATOS, "w", write_headers: true, headers: ["id", "nombre", "notas"]) do |csv|
     $estudiantes.each do |e|
@@ -45,9 +47,10 @@ def guardar_datos
 end
 
 # ----------------------------------------
-# FUNCIONES DEL SISTEMA
+# FUNCIONALIDADES PRINCIPALES
 # ----------------------------------------
 
+# Registrar estudiante
 def registrar_estudiante
   puts "\n[Registrar Estudiante]"
   print "Ingrese el ID del estudiante (número entero): "
@@ -70,6 +73,7 @@ def registrar_estudiante
   puts "✅ Estudiante registrado con éxito.\n\n"
 end
 
+# Ingresar notas a un estudiante
 def ingresar_notas
   puts "\n[Ingresar Notas]"
   print "Ingrese el ID del estudiante: "
@@ -89,16 +93,19 @@ def ingresar_notas
   cantidad.times do |i|
     print "Ingrese la nota ##{i + 1} (0.00 - 100.00): "
     nota = gets.chomp.to_f
+
     if nota < 0 || nota > 100
       puts "❌ Error: La nota debe estar entre 0 y 100."
       redo
     end
+
     estudiante[:notas] << nota
   end
 
   puts "✅ Notas actualizadas correctamente para #{estudiante[:nombre]}.\n\n"
 end
 
+# Consultar promedio de un estudiante
 def consultar_promedio
   puts "\n[Consultar Promedio]"
   print "Ingrese el ID del estudiante: "
@@ -122,18 +129,18 @@ def consultar_promedio
   puts "Promedio: #{promedio}\n\n"
 end
 
-# 🆕 Semana 14: Listar con promedio
+# Listar todos los estudiantes con promedio
 def listar_estudiantes
   puts "\n[Listar Estudiantes con Promedio]"
   if $estudiantes.empty?
     puts "No hay estudiantes registrados.\n\n"
   else
-    puts "ID\tNombre\t\tNotas\t\tPromedio"
-    puts "-" * 60
+    puts "ID\tNombre\t\t\tNotas\t\t\tPromedio"
+    puts "-" * 75
     $estudiantes.each do |e|
       notas_str = e[:notas].empty? ? "Sin notas" : e[:notas].join(", ")
       promedio = e[:notas].empty? ? "N/A" : (e[:notas].sum / e[:notas].size).round(2)
-      puts "#{e[:id]}\t#{e[:nombre].ljust(16)}\t#{notas_str.ljust(15)}\t#{promedio}"
+      puts "#{e[:id]}\t#{e[:nombre].ljust(20)}\t#{notas_str.ljust(25)}\t#{promedio}"
     end
     puts "\n"
   end
@@ -171,7 +178,7 @@ def mostrar_menu
 end
 
 # ----------------------------------------
-# EJECUCIÓN
+# EJECUCIÓN PRINCIPAL
 # ----------------------------------------
 
 cargar_datos
